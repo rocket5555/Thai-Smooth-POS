@@ -1,3 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Thai Festival Cashier</title>
+<style>
+  body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; margin: 0; padding: 4px; padding-bottom: 65px; background-color: #f9f9f9; }
+  
+  /* Micro-Headers to save space */
+  h2 { text-align: left; margin: 8px 4px 4px 4px; font-size: 13px; color: #555; border-bottom: 1px solid #ddd; padding-bottom: 2px;}
+  
+  /* Strict 3-column grid for maximum compactness */
+  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; margin-bottom: 6px; }
+  
+  /* Compact Buttons */
+  .btn { padding: 8px 2px; font-size: 13px; font-weight: bold; border: none; border-radius: 6px; color: white; touch-action: manipulation; box-shadow: 0 1px 3px rgba(0,0,0,0.1); line-height: 1.15; }
+  .btn small { display: block; font-size: 9px; font-weight: normal; margin-top: 3px; opacity: 0.95; }
+  .btn:active { transform: scale(0.95); }
+  
+  /* Colors */
+  .thai-drinks { background-color: #f57c00; } 
+  .other-drinks { background-color: #1976d2; } 
+  .smoothies { background-color: #e53935; } 
+  .dessert { background-color: #d81b60; } 
+  .food { background-color: #4caf50; } 
+  
+  /* Cart Area */
+  #cart-container { background: white; padding: 10px; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); margin-bottom: 15px;}
+  .cart-item { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid #eee; font-size: 14px; }
+  .cart-item-name { font-weight: bold; color: #222; }
+  .cart-item-sub { color: #555; font-size: 11px; margin-top: 2px;}
+  .remove-btn { background-color: #ffebee; border: 1px solid #ffcdd2; padding: 6px 12px; border-radius: 5px; font-weight: bold; color: #d32f2f; font-size: 14px; }
+  
+  /* Slim Fixed Bottom Bar */
+  .bottom-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: #222; color: white; padding: 8px 10px; box-sizing: border-box; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 -2px 10px rgba(0,0,0,0.3); z-index: 1000; }
+  .total-price { font-size: 14px; font-weight: bold; display: flex; align-items: baseline; gap: 6px; }
+  .amount { font-size: 20px; color: #4caf50; }
+  
+  /* Bottom Bar Buttons */
+  .action-buttons { display: flex; gap: 6px; }
+  .undo-btn { background: #ff9800; color: white; border: none; padding: 8px 12px; font-size: 13px; font-weight: bold; border-radius: 6px; }
+  .clear-btn { background: #ff3b30; color: white; border: none; padding: 8px 12px; font-size: 13px; font-weight: bold; border-radius: 6px; }
+</style>
+</head>
+<body>
+
+<h2>Thai Drinks / タイドリンク</h2>
+<div class="grid">
+  <button class="btn thai-drinks" onclick="add('ชาไทยไข่มุก', 'Bubble Thai Tea', 'タピオカタイティー', 700)">🧋 ชาไทยไข่มุก<br><small>Bubble Tea ¥700</small></button>
+  <button class="btn thai-drinks" onclick="add('ชาไทย', 'Thai Milk Tea', 'タイティー', 600)">🥤 ชาไทย<br><small>Thai Tea ¥600</small></button>
+  <button class="btn thai-drinks" onclick="add('มะม่วงลาเต้ไข่มุก', 'Bubble Mango Latte', 'タピオカマンゴーラテ', 700)">🧋 มะม่วงลาเต้ไข่มุก<br><small>Bubble Mango ¥700</small></button>
+  <button class="btn thai-drinks" onclick="add('มะม่วงลาเต้', 'Mango Latte', 'マンゴーラテ', 600)">🥭 มะม่วงลาเต้<br><small>Mango Latte ¥600</small></button>
+</div>
+
+<h2>Other Drinks / その他ドリンク</h2>
+<div class="grid">
+  <button class="btn other-drinks" onclick="add('นมชมพู', 'Thai Pink Milk', 'ノムイェン', 600)">🌸 นมชมพู<br><small>Pink Milk ¥600</small></button>
+  <button class="btn other-drinks" onclick="add('กาแฟเย็น', 'Thai Coffee', 'タイコーヒー', 600)">☕ กาแฟเย็น<br><small>Thai Coffee ¥600</small></button>
+  <button class="btn other-drinks" onclick="add('ชาลิ้นจี่', 'Thai Lychee Tea', 'タイライチティー', 600)">🍵 ชาลิ้นจี่<br><small>Lychee Tea ¥600</small></button>
+  <button class="btn other-drinks" onclick="add('น้ำลำไย', 'Longan Juice', 'ラムヤイジュース', 600)">🧃 น้ำลำไย<br><small>Longan Juice ¥600</small></button>
+  <button class="btn other-drinks" onclick="add('แดงโซดา', 'Red Soda', 'レッドソーダ', 600)">🔴 แดงโซดา<br><small>Red Soda ¥600</small></button>
+  <button class="btn other-drinks" onclick="add('เขียวโซดา', 'Green Soda', 'グリーンソーダ', 600)">🟢 เขียวโซดา<br><small>Green Soda ¥600</small></button>
+  <button class="btn other-drinks" onclick="add('น้ำมะพร้าว', 'Coconut Juice', 'ココナッツジュース', 600)">🥥 น้ำมะพร้าว<br><small>Coco Juice ¥600</small></button>
+  <button class="btn other-drinks" onclick="add('น้ำตะไคร้', 'Lemongrass Juice', 'レモングラスジュース', 600)">🌿 น้ำตะไคร้<br><small>Lemongrass ¥600</small></button>
+  <button class="btn other-drinks" onclick="add('ชามะลิ', 'Jasmine Tea', 'ジャスミンティー', 600)">🌼 ชามะลิ<br><small>Jasmine Tea ¥600</small></button>
+</div>
+
+<h2>Smoothies / スムージー</h2>
+<div class="grid">
+  <button class="btn smoothies" onclick="add('แตงโมปั่น', 'Watermelon Smoothie', 'スイカスムージー', 700)">🍉 แตงโมปั่น<br><small>Watermelon ¥700</small></button>
+  <button class="btn smoothies" onclick="add('มะม่วงปั่น', 'Mango Smoothie', 'マンゴースムージー', 700)">🥭 มะม่วงปั่น<br><small>Mango ¥700</small></button>
+  <button class="btn smoothies" onclick="add('สับปะรดปั่น', 'Pineapple Smoothie', 'パインスムージー', 700)">🍍 สับปะรดปั่น<br><small>Pineapple ¥700</small></button>
+  <button class="btn smoothies" onclick="add('ลิ้นจี่ปั่น', 'Lychee Smoothie', 'ライチスムージー', 700)">🍒 ลิ้นจี่ปั่น<br><small>Lychee ¥700</small></button>
+  <button class="btn smoothies" onclick="add('มะพร้าวปั่น', 'Coconut Smoothie', 'ココナッツスムージー', 700)">🥥 มะพร้าวปั่น<br><small>Coconut ¥700</small></button>
+</div>
+
+<h2>Dessert & Food / デザート & フード</h2>
+<div class="grid">
+  <button class="btn dessert" onclick="add('ไอศกรีมกะทิ', 'Coconut Ice Cream w/ Mango', 'ココナッツアイス', 700)">🍨 ไอศกรีมกะทิ<br><small>Coco Ice ¥700</small></button>
+  <button class="btn food" onclick="add('ข้าวเหนียวมะม่วง', 'Mango Sticky Rice', 'マンゴーもち米', 1000)">🥭 ข้าวเหนียวมะม่วง<br><small>Sticky Rice ¥1000</small></button>
+  <button class="btn food" onclick="add('อาหารไทย', 'Thai Food', 'タイ料理', 900)">🍛 อาหารไทย<br><small>Thai Food ¥900</small></button>
+  <button class="btn food" onclick="add('กล้วยทอด', 'Fried Banana', '揚げバナナ', 700)">🍌 กล้วยทอด<br><small>Fried Banana ¥700</small></button>
+</div>
+
+<h2 id="order-section">Current Order / 現在の注文</h2>
+<div id="cart-container">
+  <div id="cart-list" style="color: #666; font-size: 13px; text-align: center;"><em>Tap items to add.<br>タップして追加。</em></div>
+</div>
+
+<div class="bottom-bar">
+  <div class="total-price">Total: <span class="amount">¥<span id="total-amount">0</span></span></div>
+  <div class="action-buttons">
+    <button class="undo-btn" onclick="undoLast()">ลบล่าสุด</button>
+    <button class="clear-btn" onclick="clearCart()">ออเดอร์ใหม่</button>
+  </div>
+</div>
+
+<script>
+  let cart = [];
+
+  function add(thaiName, enName, jpName, price) {
+    cart.push({ thaiName, enName, jpName, price, id: Date.now() });
+    updateUI();
+  }
+
+  function undoLast() {
+    if (cart.length > 0) {
+      cart.pop(); 
+      updateUI();
+    }
+  }
+
+  function remove(id) {
+    cart = cart.filter(item => item.id !== id);
+    updateUI();
+  }
+
+  function clearCart() {
+    cart = [];
+    updateUI();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function updateUI() {
+    const list = document.getElementById('cart-list');
+    const totalAmount = document.getElementById('total-amount');
+    
+    if (cart.length === 0) {
+      list.innerHTML = '<em>Tap items to add.<br>タップして追加。</em>';
+      list.style.textAlign = 'center';
+      totalAmount.innerText = '0';
+      return;
     }
 
     list.style.textAlign = 'left';
