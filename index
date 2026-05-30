@@ -1,0 +1,25 @@
+    }
+
+    list.style.textAlign = 'left';
+    let html = '';
+    let sum = 0;
+    cart.forEach(item => {
+      html += `
+        <div class="cart-item">
+          <div>
+            <div class="cart-item-name">${item.thaiName} (¥${item.price})</div>
+            <div class="cart-item-sub">${item.enName} / ${item.jpName}</div>
+          </div>
+          <button class="remove-btn" onclick="remove(${item.id})">X</button>
+        </div>
+      `;
+      sum += item.price;
+    });
+
+    list.innerHTML = html;
+    totalAmount.innerText = sum;
+  }
+</script>
+
+</body>
+</html>
